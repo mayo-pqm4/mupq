@@ -33,20 +33,22 @@ int main(void)
   unsigned char pk[MUPQ_CRYPTO_PUBLICKEYBYTES];
   unsigned char sm[MLEN+MUPQ_CRYPTO_BYTES];
   size_t smlen;
-  unsigned long long t0, t1;
+  unsigned long long t0, t1, kpt;
   int i;
 
   hal_setup(CLOCK_BENCHMARK);
 
   hal_send_str("==========================");
 
+  // Key-pair generation
+  t0 = hal_get_time();
+  MUPQ_crypto_sign_keypair(pk, sk);
+  t1 = hal_get_time();
+  kpt = t1-t0;
+
   for(i=0;i<MUPQ_ITERATIONS; i++)
   {
-    // Key-pair generation
-    t0 = hal_get_time();
-    MUPQ_crypto_sign_keypair(pk, sk);
-    t1 = hal_get_time();
-    printcycles("keypair cycles:", t1-t0);
+    printcycles("keypair cycles:", kpt);
 
     // Signing
     t0 = hal_get_time();

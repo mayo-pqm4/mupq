@@ -26,7 +26,7 @@
 
 #define printcycles(S, U) send_unsignedll((S), (U))
 
-unsigned long long hash_cycles;
+unsigned long long hash_cycles, kp_hash_cycles;
 
 int main(void)
 {
@@ -34,22 +34,25 @@ int main(void)
   unsigned char pk[MUPQ_CRYPTO_PUBLICKEYBYTES];
   unsigned char sm[MLEN+MUPQ_CRYPTO_BYTES];
   size_t smlen;
-  unsigned long long t0, t1;
+  unsigned long long t0, t1, kpt;
   int i;
 
   hal_setup(CLOCK_BENCHMARK);
 
   hal_send_str("==========================");
 
+  // Key-pair generation
+  hash_cycles = 0;
+  t0 = hal_get_time();
+  MUPQ_crypto_sign_keypair(pk, sk);
+  t1 = hal_get_time();
+  kpt = t1-t0;
+  kp_hash_cycles = hash_cycles;
+
   for(i=0;i<MUPQ_ITERATIONS; i++)
   {
-    // Key-pair generation
-    hash_cycles = 0;
-    t0 = hal_get_time();
-    MUPQ_crypto_sign_keypair(pk, sk);
-    t1 = hal_get_time();
-    printcycles("keypair cycles:", t1-t0);
-    printcycles("keypair hash cycles:", hash_cycles);
+    printcycles("keypair cycles:", kpt);
+    printcycles("keypair hash cycles:", kp_hash_cycles);
 
     // Signing
     hash_cycles = 0;
